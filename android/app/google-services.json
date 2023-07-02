@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "700501535565",
+    "firebase_url": "https://jritev4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "jritev4",
+    "storage_bucket": "jritev4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700501535565:android:50aa499d908b2ddf7a2504",
+        "android_client_info": {
+          "package_name": "com.example.jritev4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700501535565-h9vpd56h21n4a7vkk31tvl58brkobehq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jritev4",
+            "certificate_hash": "266b26007b2f82130b1ea4a40a9d1c1819efa76e"
+          }
+        },
+        {
+          "client_id": "700501535565-o1v1amijfji1b7m9i62k8i7ul4da4ar2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-xOutkF9Ydl_p_t5Y_Velnp_1d-SKCLE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700501535565-o1v1amijfji1b7m9i62k8i7ul4da4ar2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
