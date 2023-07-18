@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -8,7 +11,9 @@ import 'package:jritev4/models/job.dart';
 import 'package:jritev4/screens/job_category.dart';
 import 'package:jritev4/screens/job_detail.dart';
 import 'package:jritev4/screens/job_submit.dart';
+import 'package:jritev4/services/notification.dart';
 import 'package:jritev4/widgets/search_bar.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class HomepageActivity extends StatefulWidget {
   @override
@@ -24,12 +29,18 @@ class _HomepageActivityState extends State<HomepageActivity> {
   List<Category> category = [];
   List<String> popular = ['Articles', 'Youtube', 'Twitter'];
   List<QueryDocumentSnapshot<Object?>>? job;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  late AndroidNotificationChannel channel;
+
   @override
   void initState() {
     super.initState();
+    requestPermission();
     getUser();
     getCategories();
     _refreshContent();
+    loadFCM();
+    listenFCM();
   }
 
   void getCategories() async {
@@ -66,6 +77,69 @@ class _HomepageActivityState extends State<HomepageActivity> {
     }).catchError((error) {
       print(error);
     });
+  }
+
+  void requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+    } else {}
+  }
+
+  void listenFCM() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                icon: 'ic_notification', subText: "Buds"),
+          ),
+        );
+      }
+    });
+  }
+
+  void loadFCM() async {
+    channel = const AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      importance: Importance.high,
+      enableVibration: true,
+    );
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    /// Create an Android Notification Channel.
+    ///
+    /// We use this channel in the `AndroidManifest.xml` file to override the
+    /// default FCM channel to enable heads up notifications.
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    /// Update the iOS foreground notification presentation options to allow
+    /// heads up notifications.
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
 
   @override
@@ -154,13 +228,23 @@ class _HomepageActivityState extends State<HomepageActivity> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context)
+                    onTap: () async {
+                      /*Navigator.of(context)
                           .push(CupertinoPageRoute(builder: (context) {
                         return JobCategoryActivity(
                           category: category[index].name!,
                         );
-                      }));
+                      }));*/
+                      //send Notifcation
+                      /* String? messagingToken = await NotificationService()
+                          .getFirebaseMessagingToken();
+                      print(messagingToken);
+                      NotificationService().sendNotification(
+                        messagingToken!,
+                      );*/
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles();
+                      print(result);
                     },
                     child: Stack(
                       children: [
